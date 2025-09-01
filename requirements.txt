@@ -5,4 +5,5 @@ numpy
 xgboost
 scikit-learn
 zenml
+zenml[server]
 mlflow
