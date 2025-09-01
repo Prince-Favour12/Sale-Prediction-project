@@ -1,0 +1,62 @@
+Model Regressor Architecture
+
+                ┌──────────────────────┐
+                │   Input Data (X, y)  │
+                │ X_train, y_train     │
+                │ X_test, y_test       │
+                └─────────┬────────────┘
+                          │
+                          ▼
+             ┌──────────────────────────┐
+             │ __post_init__()          │
+             │ - Scale X if scaling=True│
+             │ - Log-transform y        │
+             └─────────┬────────────────┘
+                       │
+                       ▼
+        ┌────────────────────────────────┐
+        │ train(tune=False/True)         │
+        │                                │
+        │ - Initialize models:           │
+        │   RF, XGB, Ridge, Lasso        │
+        │ - If tune=True →               │
+        │   RandomizedSearchCV tuning    │
+        │ - Fit models                   │
+        │ - Store models in class        │
+        │ - Create VotingRegressor       │
+        └──────────────┬─────────────────┘
+                       │
+                       ▼
+        ┌────────────────────────────────┐
+        │ evaluate()                      │
+        │ - Predict on X_test             │
+        │ - Inverse log transform (expm1) │
+        │ - Metrics: MSE, RMSE, R²        │
+        │ - Print results                 │
+        └──────────────┬─────────────────┘
+                       │
+       ┌───────────────┴─────────────────────────┐
+       │                                           │
+       ▼                                           ▼
+┌────────────────────────┐             ┌──────────────────────────┐
+│ plot_importance()      │             │ plot_predictions_vs_actual│
+│ - RF/XGB: importances  │             │ - Scatter plots           │
+│ - Ridge/Lasso: coefs   │             │ - Actual vs Predicted     │
+└───────────────┬────────┘             └───────────────┬──────────┘
+                │                                      │
+                ▼                                      ▼
+     ┌─────────────────────────┐          ┌────────────────────────────┐
+     │ get_regularization_     │          │ plot_regularization_path() │
+     │ analysis()              │          │ - Vary alpha               │
+     │ - Ridge & Lasso stats   │          │ - Plot coef shrinkage      │
+     │ - Features selected     │          └────────────────────────────┘
+     └───────────────┬─────────┘
+                     │
+                     ▼
+       ┌─────────────────────────┐
+       │ compare_coefficients()  │
+       │ - Bar chart Ridge vs    │
+       │   Lasso coefficients    │
+       │ - Print comparison      │
+       └─────────────────────────┘
+
